@@ -658,8 +658,12 @@ if run_button:
 
         # ===== KEY METRICS =====
         st.markdown('<h2 class="section-header">Key Metrics</h2>', unsafe_allow_html=True)
+        # Find algorithms with minimum interest
+        min_interest = min(r["Interest Value"] for r in results)
         optimal_results = [r for r in results if r["Interest Value"] == min_interest]
-        optimal_algo = optimal_results[0]["Algorithm"]
+        # Among those with lowest interest, pick the one with fewest states explored
+        best_result = min(optimal_results, key=lambda r: r["States Explored"])
+        optimal_algo = best_result["Algorithm"]
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -721,13 +725,21 @@ if run_button:
         # ===== METHOD EXPLANATION =====
         st.markdown('<h2 class="section-header">How the Optimal Solution Was Found</h2>', unsafe_allow_html=True)
 
+        # Create algorithm results lookup for dynamic explanation
+        algo_results = {r["Algorithm"]: r for r in results}
+        ucs_states = algo_results.get("UCS", {}).get("States Explored", 0)
+        astar_states = algo_results.get("A*", {}).get("States Explored", 0)
+        greedy_states = algo_results.get("Greedy Best-First", {}).get("States Explored", 0)
+        dfs_states = algo_results.get("DFS", {}).get("States Explored", 0)
+        bfs_states = algo_results.get("BFS", {}).get("States Explored", 0)
+
         with st.expander("Click to see the A* Search Method Explained", expanded=True):
             st.markdown("""
             ### The Problem as a Search Problem
 
             | Search Concept | Debt Repayment Equivalent |
             |---------------|--------------------------|
-            | **State** | (Loan Balance, Card Balance) e.g., (₹1,00,000, ₹60,000) |
+            | **State** | (Loan Balance, Card Balance) e.g., (₹{loan:,}, ₹{card:,}) |
             | **Start State** | Your initial debt amounts |
             | **Goal State** | (0, 0) — Both debts cleared |
             | **Actions** | Each month: Pay **Loan First** OR **Card First** |
@@ -735,30 +747,30 @@ if run_button:
             | **Path Cost (g)** | Total interest paid so far |
             | **Heuristic (h)** | Estimated minimum remaining interest |
             | **f = g + h** | A* evaluation function |
-            """)
+            """.format(loan=loan, card=card))
 
             st.markdown("### Why A* Finds the Optimal Solution")
 
             col1, col2 = st.columns(2)
 
             with col1:
-                st.markdown("""
+                st.markdown(f"""
                 <div class="method-step">
                 <h4>1. UCS (Uniform Cost Search)</h4>
-                <p>Expands the state with <strong>lowest interest paid so far (g)</strong>. Guaranteed optimal but explores blindly in all directions — 243 states in Test 1.</p>
+                <p>Expands the state with <strong>lowest interest paid so far (g)</strong>. Guaranteed optimal but explores blindly in all directions — {ucs_states} states in this case.</p>
                 </div>
 
                 <div class="method-step">
                 <h4>2. Greedy Best-First</h4>
-                <p>Expands the state with <strong>lowest estimated remaining interest (h)</strong>. Fast (13 states) but not optimal — ignores interest already paid.</p>
+                <p>Expands the state with <strong>lowest estimated remaining interest (h)</strong>. Fast ({greedy_states} states) but not optimal — ignores interest already paid.</p>
                 </div>
                 """, unsafe_allow_html=True)
 
             with col2:
-                st.markdown("""
+                st.markdown(f"""
                 <div class="method-step">
                 <h4>3. A* Search (Best of Both)</h4>
-                <p>Expands state with <strong>lowest f = g + h</strong>. Combines actual cost so far with intelligent estimate of remaining cost. <strong>Optimal AND efficient</strong> — only 29 states!</p>
+                <p>Expands state with <strong>lowest f = g + h</strong>. Combines actual cost so far with intelligent estimate of remaining cost. <strong>Optimal AND efficient</strong> — only {astar_states} states!</p>
                 </div>
 
                 <div class="method-step">

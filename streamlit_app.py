@@ -658,8 +658,12 @@ if run_button:
 
         # ===== KEY METRICS =====
         st.markdown('<h2 class="section-header">Key Metrics</h2>', unsafe_allow_html=True)
+        # Find algorithms with minimum interest
+        min_interest = min(r["Interest Value"] for r in results)
         optimal_results = [r for r in results if r["Interest Value"] == min_interest]
-        optimal_algo = optimal_results[0]["Algorithm"]
+        # Among those with lowest interest, pick the one with fewest states explored
+        best_result = min(optimal_results, key=lambda r: r["States Explored"])
+        optimal_algo = best_result["Algorithm"]
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:

@@ -241,31 +241,89 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS - Professional theme-aware styling
 st.markdown("""
 <style>
+    /* CSS Variables for theme-aware colors */
+    :root {
+        --primary: #4f46e5;
+        --primary-light: #818cf8;
+        --primary-dark: #3730a3;
+        --secondary: #06b6d4;
+        --success: #10b981;
+        --success-light: #34d399;
+        --danger: #ef4444;
+        --danger-light: #f87171;
+        --warning: #f59e0b;
+        --warning-light: #fbbf24;
+    }
+
+    /* Light mode (default) */
+    @media (prefers-color-scheme: light) {
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f8fafc;
+        }
+    }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --sidebar-bg: #1e293b;
+        }
+    }
+
+    /* Streamlit theme override - ensure variables work */
+    .stApp {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    /* Header styles */
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #1f2937;
+        color: var(--text-primary);
         text-align: center;
         margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     .sub-header {
         font-size: 1.1rem;
-        color: #6b7280;
+        color: var(--text-secondary);
         text-align: center;
         margin-bottom: 2rem;
     }
+
+    /* Card styles - theme aware */
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         padding: 1.5rem;
         border-radius: 12px;
         color: white;
         text-align: center;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
     }
     .optimal-badge {
-        background: #10b981;
+        background: var(--success);
         color: white;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
@@ -273,7 +331,7 @@ st.markdown("""
         font-weight: 600;
     }
     .suboptimal-badge {
-        background: #ef4444;
+        background: var(--danger);
         color: white;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
@@ -281,18 +339,164 @@ st.markdown("""
         font-weight: 600;
     }
     .info-box {
-        background: #f3f4f6;
+        background: var(--bg-secondary);
         padding: 1rem;
         border-radius: 8px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid var(--primary);
         margin: 1rem 0;
+        color: var(--text-primary);
     }
     .method-step {
-        background: white;
+        background: var(--card-bg);
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
         margin: 0.5rem 0;
+        color: var(--text-primary);
+    }
+
+    /* Sidebar styling */
+    .css-1d391kg, .css-1lcbmhc, .css-1outpf7 {
+        background-color: var(--sidebar-bg) !important;
+    }
+
+    /* DataFrame styling */
+    .stDataFrame {
+        background-color: var(--card-bg) !important;
+    }
+    .stDataFrame [data-testid="stTable"] {
+        background-color: var(--card-bg) !important;
+    }
+
+    /* Input fields */
+    .stNumberInput input, .stSelectbox select, .stTextInput input {
+        background-color: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4) !important;
+    }
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: var(--bg-secondary);
+        padding: 4px;
+        border-radius: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent !important;
+        color: var(--text-secondary) !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: var(--primary) !important;
+        color: white !important;
+    }
+
+    /* Expander */
+    .streamlit-expanderHeader {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--border-color) !important;
+    }
+    .streamlit-expanderContent {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-top: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+
+    /* Streamlit status boxes - theme aware */
+    .stAlert {
+        background-color: var(--bg-secondary) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+    .stAlert[data-baseweb="notification"] {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    /* Success box */
+    .stSuccess {
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        border-left: 4px solid var(--success) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Info box */
+    .stInfo {
+        background-color: rgba(6, 182, 212, 0.15) !important;
+        border-left: 4px solid var(--secondary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Warning box */
+    .stWarning {
+        background-color: rgba(245, 158, 11, 0.15) !important;
+        border-left: 4px solid var(--warning) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Error box */
+    .stError {
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        border-left: 4px solid var(--danger) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Metric containers */
+    [data-testid="stMetric"] {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: var(--text-secondary) !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: var(--text-primary) !important;
+    }
+
+    /* Markdown text */
+    .stMarkdown, .stMarkdown p, .stMarkdown li, .stMarkdown ul, .stMarkdown ol {
+        color: var(--text-primary) !important;
+    }
+
+    /* Plotly charts container */
+    .js-plotly-plot {
+        background-color: var(--card-bg) !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -373,10 +577,10 @@ if run_button:
             for r in results
         ])
 
-        # Style the dataframe
+        # Style the dataframe - theme aware
         def highlight_optimal(row):
             if row["Status"] == "✅ Optimal":
-                return ['background-color: #d1fae5'] * len(row)
+                return ['background-color: rgba(16, 185, 129, 0.15)'] * len(row)
             return [''] * len(row)
 
         st.dataframe(
@@ -426,7 +630,7 @@ if run_button:
         tab1, tab2, tab3 = st.tabs(["Interest Comparison", "Efficiency Comparison", "Monthly Breakdown"])
 
         with tab1:
-            # Bar chart for interest
+            # Bar chart for interest - theme aware
             fig_interest = px.bar(
                 df_results,
                 x="Algorithm",
@@ -434,14 +638,24 @@ if run_button:
                 color="Status",
                 color_discrete_map={"✅ Optimal": "#10b981", "❌ Suboptimal": "#ef4444"},
                 title="Total Interest Paid by Algorithm",
-                text="Total Interest"
+                text="Total Interest",
+                template="plotly_white"
             )
             fig_interest.update_traces(textposition='outside')
-            fig_interest.update_layout(showlegend=False, yaxis_title="Interest (₹)")
+            fig_interest.update_layout(
+                showlegend=False,
+                yaxis_title="Interest (₹)",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color="#1e293b"),
+                title_font=dict(size=16, color="#1e293b"),
+                xaxis=dict(gridcolor="#e2e8f0"),
+                yaxis=dict(gridcolor="#e2e8f0")
+            )
             st.plotly_chart(fig_interest, use_container_width=True)
 
         with tab2:
-            # Scatter plot: States explored vs Interest
+            # Scatter plot: States explored vs Interest - theme aware
             fig_scatter = px.scatter(
                 df_results,
                 x="States Explored",
@@ -450,9 +664,20 @@ if run_button:
                 size="Months",
                 hover_data=["Months"],
                 title="Search Efficiency: States Explored vs Interest Paid",
-                labels={"Interest Value": "Total Interest (₹)", "States Explored": "States Explored"}
+                labels={"Interest Value": "Total Interest (₹)", "States Explored": "States Explored"},
+                template="plotly_white",
+                color_discrete_sequence=["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"]
             )
-            fig_scatter.update_layout(xaxis_type="log")
+            fig_scatter.update_layout(
+                xaxis_type="log",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color="#1e293b"),
+                title_font=dict(size=16, color="#1e293b"),
+                xaxis=dict(gridcolor="#e2e8f0"),
+                yaxis=dict(gridcolor="#e2e8f0"),
+                legend=dict(bgcolor='rgba(255,255,255,0.8)')
+            )
             st.plotly_chart(fig_scatter, use_container_width=True)
 
             st.info("💡 **Lower left is better** — fewer states explored AND less interest paid. A* achieves this!")
@@ -485,12 +710,12 @@ if run_button:
 
             fig_monthly.add_trace(
                 go.Scatter(x=df_months["Month"], y=df_months["Loan Balance"],
-                          name="Loan", line=dict(color="#667eea", width=3), fill='tozeroy'),
+                          name="Loan", line=dict(color="#4f46e5", width=3), fill='tozeroy', fillcolor='rgba(79,70,229,0.1)'),
                 row=1, col=1
             )
             fig_monthly.add_trace(
                 go.Scatter(x=df_months["Month"], y=df_months["Card Balance"],
-                          name="Card", line=dict(color="#764ba2", width=3), fill='tozeroy'),
+                          name="Card", line=dict(color="#06b6d4", width=3), fill='tozeroy', fillcolor='rgba(6,182,212,0.1)'),
                 row=1, col=1
             )
             fig_monthly.add_trace(
@@ -499,10 +724,18 @@ if run_button:
                 row=2, col=1
             )
 
-            fig_monthly.update_layout(height=600, showlegend=True)
-            fig_monthly.update_xaxes(title_text="Month", row=2, col=1)
-            fig_monthly.update_yaxes(title_text="Balance (₹)", row=1, col=1)
-            fig_monthly.update_yaxes(title_text="Interest (₹)", row=2, col=1)
+            fig_monthly.update_layout(
+                height=600,
+                showlegend=True,
+                template="plotly_white",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color="#1e293b"),
+                legend=dict(bgcolor='rgba(255,255,255,0.8)')
+            )
+            fig_monthly.update_xaxes(title_text="Month", row=2, col=1, gridcolor="#e2e8f0")
+            fig_monthly.update_yaxes(title_text="Balance (₹)", row=1, col=1, gridcolor="#e2e8f0")
+            fig_monthly.update_yaxes(title_text="Interest (₹)", row=2, col=1, gridcolor="#e2e8f0")
 
             st.plotly_chart(fig_monthly, use_container_width=True)
 

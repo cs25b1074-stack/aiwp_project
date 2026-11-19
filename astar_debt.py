@@ -6,10 +6,14 @@ def interest(state):
 def neighbours(state):
     result = []
     loan, card = state
-    extra = income - interest(state) - savings
+    extra = income - interest(state) - savings   # left after interest and savings
+
+    # choice 1: repay the LOAN first, anything left over goes to the card
     pay_loan = min(extra, loan)
     pay_card = min(extra - pay_loan, card)
     result.append((loan - pay_loan, card - pay_card))
+
+    # choice 2: repay the CARD first, anything left over goes to the loan
     pay_card = min(extra, card)
     pay_loan = min(extra - pay_card, loan)
     child = (loan - pay_loan, card - pay_card)
@@ -25,22 +29,24 @@ def show(state):
 def path_cost(path):
     total = 0
     for state in path[:-1]:
-        total = total + interest(state)
+        total = total + interest(state)          # interest paid in every month
     return total
 
 
 def heuristic(state):
     total = state[0] + state[1]
-    low = min(loan_rate, card_rate) / 1200
+    low = min(loan_rate, card_rate) / 1200      # lowest monthly rate
     h = 0
     while total > 0:
-        h = h + total * low - 1
-        total = total - payment
+        h = h + total * low - 1                 # -1 = safety margin for rounding
+        total = total - payment                 # we can't pay faster than this
     return max(0, h)
 
 
-graph = {}
+graph = {}                                  # adjacency list
 
+
+# ===== WRITE YOUR ALGORITHM FUNCTION HERE =====
 
 def astar(start):
     OPEN = [(heuristic(start), 0, start)]
@@ -80,16 +86,16 @@ loan_rate = float(input("Enter loan interest rate (% per year): "))
 card = int(input("Enter credit card amount: "))
 card_rate = float(input("Enter credit card interest rate (% per year): "))
 
-payment = income - savings
+payment = income - savings                  # most that can ever go to the debts in a month
 start = (loan, card)
 goal = (0, 0)
 
 if income - interest(start) - savings <= 0:
     print("After paying the interest and savings, nothing is left to repay the debt")
 else:
-    path, explored = astar(start)
+    path, explored = astar(start)          # <- change ALGORITHM to your function name
     print()
-    print("Solution found using A* Search")
+    print("Solution found using A* Search")   # <- change the name
     month = 0
     for state in path:
         print("Month", month, end="   ")

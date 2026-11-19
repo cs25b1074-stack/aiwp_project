@@ -193,5 +193,6 @@ else:
     print("Algorithm                  Interest paid   Months   States explored")
     for name, algorithm in [("BFS", bfs), ("DFS", dfs), ("UCS", ucs),
                             ("Greedy Best-First", greedy), ("A*", astar)]:
+        graph = {}
         path, explored = algorithm(start)
         print(name.ljust(26), str(path_cost(path)).ljust(15), str(len(path) - 1).ljust(8), explored)
